@@ -48,12 +48,13 @@ public:
     
     void OnPrimaryPointUpdate(const XnVHandPointContext*);
     
-    void OnPrimaryPointCreate(const XnVHandPointContext*);
+    void OnPrimaryPointCreate(const XnVHandPointContext*,const XnPoint3D &);
 	/**
 	 * Handle destruction of an existing point
 	 */
 	void OnPointDestroy(XnUInt32 nID);
 
+	void OnPrimaryPointDestroy(XnUInt32 nID);
 	/**
 	 * Draw the points, each with its own color.
 	 */
@@ -82,6 +83,9 @@ protected:
 
 	XnBool m_bDrawDM;
 	XnBool m_bFrameID;
+    XnUInt32 m_primaryHandID;
+    bool primaryHandControl;
+    bool secondryHandSelected;
 };
 
 #endif
