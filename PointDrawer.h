@@ -45,6 +45,10 @@ public:
 	 * Handle new position of an existing point
 	 */
 	void OnPointUpdate(const XnVHandPointContext* cxt);
+    
+    void OnPrimaryPointUpdate(const XnVHandPointContext*);
+    
+    void OnPrimaryPointCreate(const XnVHandPointContext*);
 	/**
 	 * Handle destruction of an existing point
 	 */

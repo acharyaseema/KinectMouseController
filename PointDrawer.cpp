@@ -65,6 +65,10 @@ void XnVPointDrawer::OnPointCreate(const XnVHandPointContext* cxt)
 	OnPointUpdate(cxt);
 	bShouldPrint = true;
 }
+void XnVPointDrawer::OnPrimaryPointCreate(const XnVHandPointContext* cxt){
+  printf("primary ID --- %d\n",cxt->nID);
+  OnPrimaryPointUpdate(cxt);
+}
 std::string IntToStr(int n){
   std::ostringstream result;
   result << n;
@@ -79,14 +83,24 @@ void XnVPointDrawer::OnPointUpdate(const XnVHandPointContext* cxt)
 	if (bShouldPrint)printf("Point (%f,%f,%f)", ptProjective.X, ptProjective.Y, ptProjective.Z);
 	m_DepthGenerator.ConvertRealWorldToProjective(1, &ptProjective, &ptProjective);
 	if (bShouldPrint)printf(" -> (%f,%f,%f)\n", ptProjective.X, ptProjective.Y, ptProjective.Z);
-	std::string mouseMoveCmd = "xte 'mousemove "+ IntToStr((int) ptProjective.X) +" " + IntToStr((int) ptProjective.Y) + "'";
-	system(mouseMoveCmd.c_str());
+  printf("values of projective Points mouse Co-ordinate x=%d,y=%d\n",(int) ptProjective.X,(int) ptProjective.Y);
 	// Add new position to the history buffer
 	m_History[cxt->nID].push_front(ptProjective);
 	// Keep size of history buffer
 	if (m_History[cxt->nID].size() > m_nHistorySize)
 		m_History[cxt->nID].pop_back();
 	bShouldPrint = false;
+}
+
+void XnVPointDrawer::OnPrimaryPointUpdate(const XnVHandPointContext* cxt){
+    printf("primary point update selected with ID %d\n",cxt->nID);
+    XnPoint3D ptProjective(cxt->ptPosition);
+	  m_DepthGenerator.ConvertRealWorldToProjective(1, &ptProjective, &ptProjective);
+    float screenX = (ptProjective.X/640) *1280;
+    float screenY = (ptProjective.Y/480) * 800;
+    std::string mouseMoveCmd = "xte 'mousemove "+ IntToStr((int) screenX) +" " + IntToStr((int) screenY ) + "'";
+	  system(mouseMoveCmd.c_str());
+    printf("values of primary projective Points mouse Co-ordinate x=%d,y=%d\n",(int) screenX ,(int) screenY);
 }
 
 // Handle destruction of an existing hand
