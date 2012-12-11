@@ -10,7 +10,7 @@
 #include <XnCppWrapper.h>
 #include <XnHash.h>
 #include <XnLog.h>
-
+#include <stdlib.h>
 // Header for NITE
 #include "XnVNite.h"
 // local header
@@ -247,7 +247,13 @@ void XN_CALLBACK_TYPE GestureProgressHandler(xn::GestureGenerator& generator, co
 
 void XN_CALLBACK_TYPE CircleCB(XnFloat fTimes, XnBool bConfident, const XnVCircle* pCircle, void* pUserCxt)
 {
-    printf("Circle Created --- Zoom In\n");
+    if(pCircle->ptCenter.Z < 0){
+        system("xte 'mouseclick 5'");
+        printf("Circle Created --- Zoom OUT\n");
+    }else{
+        system("xte 'mouseclick 4'");
+        printf("Circle Created --- Zoom In\n");
+    }
 }
 
 void XN_CALLBACK_TYPE NoCircleCB(XnFloat fLastValue, XnVCircleDetector::XnVNoCircleReason reason, void * pUserCxt)
