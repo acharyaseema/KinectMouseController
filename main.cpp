@@ -60,7 +60,7 @@ xn::GestureGenerator g_GestureGenerator;
 // NITE objects
 XnVSessionManager* g_pSessionManager;
 XnVFlowRouter* g_pFlowRouter;
-
+XnVCircleDetector*  g_pCircle = NULL;
 // the drawer
 XnVPointDrawer* g_pDrawer;
 
@@ -245,6 +245,25 @@ void XN_CALLBACK_TYPE GestureProgressHandler(xn::GestureGenerator& generator, co
 	printf("Gesture %s progress: %f (%f,%f,%f)\n", strGesture, fProgress, pPosition->X, pPosition->Y, pPosition->Z);
 }
 
+void XN_CALLBACK_TYPE CircleCB(XnFloat fTimes, XnBool bConfident, const XnVCircle* pCircle, void* pUserCxt)
+{
+    printf("Circle Created --- Zoom In\n");
+}
+
+void XN_CALLBACK_TYPE NoCircleCB(XnFloat fLastValue, XnVCircleDetector::XnVNoCircleReason reason, void * pUserCxt)
+{
+    printf("Circle Not Created \n");
+}
+
+void XN_CALLBACK_TYPE Circle_PrimaryCreate(const XnVHandPointContext *cxt, const XnPoint3D& ptFocus, void * pUserCxt)
+{
+    printf("Circle primary Create \n");
+}
+
+void XN_CALLBACK_TYPE Circle_PrimaryDestroy(XnUInt32 nID, void * pUserCxt)
+{
+    printf("Circle primary destroy \n");
+}
 
 // xml to initialize OpenNI
 #define SAMPLE_XML_PATH "../../../Data/Sample-Tracking.xml"
@@ -284,6 +303,16 @@ int main(int argc, char ** argv)
 	CHECK_RC(rc, "SessionManager::Initialize");
 
 	g_pSessionManager->RegisterSession(NULL, SessionStarting, SessionEnding, FocusProgress);
+
+	g_pCircle = new XnVCircleDetector;
+	g_pCircle->RegisterCircle(NULL, &CircleCB);
+	g_pCircle->RegisterNoCircle(NULL, &NoCircleCB);
+	g_pCircle->RegisterPrimaryPointCreate(NULL, &Circle_PrimaryCreate);
+    g_pCircle->RegisterPrimaryPointDestroy(NULL, &Circle_PrimaryDestroy);
+    g_pFlowRouter = new XnVFlowRouter;
+	g_pFlowRouter->SetActive(g_pCircle);
+	g_pSessionManager->AddListener(g_pFlowRouter);
+
 
 	g_pDrawer = new XnVPointDrawer(20, g_DepthGenerator); 
 	g_pFlowRouter = new XnVFlowRouter;
