@@ -247,7 +247,7 @@ void XN_CALLBACK_TYPE GestureProgressHandler(xn::GestureGenerator& generator, co
 
 void XN_CALLBACK_TYPE CircleCB(XnFloat fTimes, XnBool bConfident, const XnVCircle* pCircle, void* pUserCxt)
 {
-    if(pCircle->ptCenter.Z < 0){
+    if(fTimes < 0){
         system("xte 'mouseclick 5'");
         printf("Circle Created --- Zoom OUT\n");
     }else{
