@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string>
 #include <sstream>
+#include <math.h>
+#include <vector>
 #ifdef USE_GLUT
 	#if (XN_PLATFORM == XN_PLATFORM_MACOSX)
 		#include <GLUT/glut.h>
@@ -107,20 +109,45 @@ void XnVPointDrawer::OnPointUpdate(const XnVHandPointContext* cxt)
 	bShouldPrint = false;
 }
 
+float XnVPointDrawer::calcScreenXY(float pr,  float sSize, float mSize){
+  return pow(pr,2)*(sSize)/pow(mSize,2);
+}
+
 void XnVPointDrawer::OnPrimaryPointUpdate(const XnVHandPointContext* cxt){
 //    printf("primary point update selected with ID %d\n",cxt->nID);
     XnPoint3D ptProjective(cxt->ptPosition);
-	  m_DepthGenerator.ConvertRealWorldToProjective(1, &ptProjective, &ptProjective);
-    float screenX = (ptProjective.X/640) *1400;
-    float screenY = (ptProjective.Y/480) * 900;
-    std::string mouseMoveCmd = "xte 'mousemove "+ IntToStr((int) screenX) +" " + IntToStr((int) screenY ) + "'";
-	  system(mouseMoveCmd.c_str());
+    m_DepthGenerator.ConvertRealWorldToProjective(1, &ptProjective, &ptProjective);
+    float screenX = calcScreenXY(ptProjective.X, 1400, 640);
+    float screenY = calcScreenXY(ptProjective.Y, 900, 480);
+
+    //Smoothening the points to be projected
+    if (tempArrX.size() >= 5){
+      tempArrX.erase(tempArrX.begin());
+    }
+    tempArrX.push_back(screenX);      
+    for (std::vector<float>::iterator it = tempArrX.begin(); it != tempArrX.end(); ++it) 
+      screenX += *it;
+
+    if (tempArrY.size() >= 5){
+      tempArrY.erase(tempArrY.begin());
+    }
+    tempArrY.push_back(screenY);      
+    for (std::vector<float>::iterator it = tempArrY.begin(); it != tempArrY.end(); ++it) 
+	screenY += *it;
+
+   if (tempArrX.size()==5 && tempArrY.size()==5){
+      screenX = screenX/5;
+      screenY = screenY/5;
+      std::string mouseMoveCmd = "xte 'mousemove "+ IntToStr((int) screenX) +" " + IntToStr((int) screenY ) + "'";
+      system(mouseMoveCmd.c_str());
+    }
 //    printf("values of primary projective Points mouse Co-ordinate x=%d,y=%d\n",(int) screenX ,(int) screenY);
 }
 
 void XnVPointDrawer::OnPrimaryPointDestroy(XnUInt32 nID){
    m_primaryHandID = 0;
    primaryHandControl = false;
+   secondryHandSelected = false;
    printf("primaryHandDestroy %d",nID);
 }
 
@@ -131,7 +158,7 @@ void XnVPointDrawer::OnPointDestroy(XnUInt32 nID)
     secondryHandSelected = false;
   }
 	// No need for the history buffer
-  system("xte 'mouseup 1'"); 
+   system("xte 'mouseup 1'"); 
    printf("pointHandDestroy %d",nID);
 	m_History.erase(nID);
 }

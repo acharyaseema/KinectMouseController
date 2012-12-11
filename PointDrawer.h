@@ -9,6 +9,7 @@
 #define XNV_POINT_DRAWER_H_
 
 #include <map>
+#include <vector>
 #include <list>
 #include <XnCppWrapper.h>
 #include <XnVPointControl.h>
@@ -70,7 +71,12 @@ public:
 	void SetFrameID(XnBool bFrameID);
 
 	void SetTouchingFOVEdge(XnUInt32 nID);
+
+	float calcScreenXY(float pr,  float sSize, float mSize);
 protected:
+	 std::vector<float> tempArrX;
+	 std::vector<float> tempArrY;
+
 	XnBool IsTouching(XnUInt32 nID) const;
 	// Number of previous position to store for each hand
 	XnUInt32 m_nHistorySize;
