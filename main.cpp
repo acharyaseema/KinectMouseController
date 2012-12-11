@@ -74,6 +74,7 @@ XnBool g_bPrintFrameID = false;
 XnFloat g_fSmoothing = 0.0f;
 XnBool g_bPause = false;
 XnBool g_bQuit = false;
+int g_zoom = 0;
 
 SessionState g_SessionState = NOT_IN_SESSION;
 
@@ -247,17 +248,21 @@ void XN_CALLBACK_TYPE GestureProgressHandler(xn::GestureGenerator& generator, co
 
 void XN_CALLBACK_TYPE CircleCB(XnFloat fTimes, XnBool bConfident, const XnVCircle* pCircle, void* pUserCxt)
 {
-    if(fTimes < 0){
-        system("xte 'mouseclick 5'");
-        printf("Circle Created --- Zoom OUT\n");
-    }else{
-        system("xte 'mouseclick 4'");
-        printf("Circle Created --- Zoom In\n");
+    if(g_zoom < 10){
+        if(fTimes < 0){
+            system("xte 'mouseclick 5'");
+            printf("Circle Created --- Zoom OUT\n");
+        }else{
+            system("xte 'mouseclick 4'");
+            printf("Circle Created --- Zoom In\n");
+        }
+        g_zoom++;
     }
 }
 
 void XN_CALLBACK_TYPE NoCircleCB(XnFloat fLastValue, XnVCircleDetector::XnVNoCircleReason reason, void * pUserCxt)
-{
+{   
+    g_zoom = 0;
     printf("Circle Not Created \n");
 }
 
